@@ -39,34 +39,54 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import com.navercorp.fixturemonkey.api.introspector.ConstructorPropertiesArbitraryIntrospector;
+import com.navercorp.fixturemonkey.jakarta.validation.spec.*;
 import net.jqwik.api.Property;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.exception.RetryableFilterMissException;
 import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.BigDecimalIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.BigIntegerIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.BooleanIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.ByteIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.CharacterIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.ContainerAnnotationIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.DoubleIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.FloatIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.IntIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.LongIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.NullAnnotationIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.ShortIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.StringIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.TimeFutureIntrospectorSpec;
-import com.navercorp.fixturemonkey.jakarta.validation.spec.TimePastIntrospectorSpec;
 
 class JakartaValidationFixtureMonkeyTest {
 	private static final FixtureMonkey SUT = FixtureMonkey.builder()
 		.plugin(new JakartaValidationPlugin())
+		.objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
 		.defaultNotNull(true)
 		.build();
 
 	private static final ZoneId ZONED_ID = ZoneId.systemDefault();
+
+	@Property(tries = 100)
+	void sampleInteger1() {
+		FixtureMonkey SUT = FixtureMonkey.builder()
+			.plugin(new JakartaValidationPlugin())
+			.objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
+			.defaultNotNull(true)
+			.build();
+
+		TestClassV1 actual = SUT.giveMeOne(TestClassV1.class);
+
+		then(actual.getValue1()).isEqualTo(3);
+		then(actual.getValue2()).isEqualTo(100);
+		then(actual.getValue1()).isBetween(3, 3);
+		then(actual.getValue2()).isBetween(100, 100);
+	}
+
+	@Property(tries = 100)
+	void sampleInteger2() {
+		FixtureMonkey SUT = FixtureMonkey.builder()
+			.plugin(new JakartaValidationPlugin())
+			.defaultNotNull(true)
+			.build();
+
+		TestClassV2 actual = SUT.giveMeOne(TestClassV2.class);
+
+		then(actual.getValue1()).isEqualTo(3);
+		then(actual.getValue2()).isEqualTo(100);
+		then(actual.getValue1()).isBetween(3, 3);
+		then(actual.getValue2()).isBetween(100, 100);
+	}
+
 
 	@Property(tries = 100)
 	void sampleBigDecimal() {
